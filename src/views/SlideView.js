@@ -8,13 +8,13 @@ define(function(require, exports, module){
     var StateModifier = require('famous/modifiers/StateModifier');
 
 
-/***************************************************************************/
+/**************************************************************************/
 //                         FUNCTION SLIDEVIEW
 //       After adding the state modifier( * ), we save a reference to the 
 //  new render node ( ** ). Everything added below this node will inherit the size 
 //  of the modifier we just created. We will be adding to this node as we create 
 //                             our surfaces.
-/***************************************************************************/
+/**************************************************************************/
     function SlideView(){
     	View.apply(this, arguments);
 
