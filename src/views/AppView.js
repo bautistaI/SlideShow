@@ -15,24 +15,41 @@ define(function(require, exports, module){
     var SlideshowView = require('views/SlideshowView');
 
     // importing the SlideView class
-    var SlideView = require('views/SlideView');
+    //var SlideView = require('views/SlideView');
 
 
     function AppView(){
-    	View.apply(this, arguments);
+        View.apply(this, arguments);
 
-        //new instance of SlideshowView
-        var slideshowView = new SlideshowView();
+        // passing in data
+        var slideshowView = new SlideshowView({
+            data: this.options.data
+        });
 
-        // add the instance to app view
         this.add(slideshowView);
     }
 
 
+                                /*****************************/
+                                /**  PROTOTYPE INHERITANCE  **/
+                                /*****************************/
+
     AppView.prototype = Object.create(View.prototype);
     AppView.prototype.constructor = AppView;
 
-    AppView.DEFAULT_OPTIONS = {};
+
+                                /*************************/
+                                /**  DEFAULT OPTIONS    **/
+                                /*************************/
+
+    AppView.DEFAULT_OPTIONS = {
+        // it's a good idea to add a property in the default options
+        // even when it's undefined    
+        data: undefined
+    };
+
+
+
 
     module.exports = AppView;
 });
