@@ -27,5 +27,7 @@ define(function(require, exports, module) {
 
 		//add the instance to the context
 		mainContext.add(appView);
+
+		mainContext.setPerspective(1000);
 	}
 });

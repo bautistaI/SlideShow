@@ -9,24 +9,26 @@ define(function(require, exports, module){
     var Surface = require('famous/core/Surface');
     var Transform = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
+    var ImageSurface = require('famous/surfaces/ImageSurface');
+    var ContainerSurface = require('famous/surfaces/ContainerSurface');
 
 
     // importing the SlideshowView class
     var SlideshowView = require('views/SlideshowView');
 
-    // importing the SlideView class
-    //var SlideView = require('views/SlideView');
+
+                                /*****************************/
+                                /**        CONSTRUCTOR      **/
+                                /*****************************/
 
 
     function AppView(){
         View.apply(this, arguments);
-
-        // passing in data
-        var slideshowView = new SlideshowView({
-            data: this.options.data
-        });
-
-        this.add(slideshowView);
+       
+        // make sure you invoke the helper function
+        // in the right context by using .call()
+        _createCamera.call(this);
+        _createSlideshow.call(this);
     }
 
 
@@ -45,8 +47,84 @@ define(function(require, exports, module){
     AppView.DEFAULT_OPTIONS = {
         // it's a good idea to add a property in the default options
         // even when it's undefined    
-        data: undefined
+        data: undefined,
+        cameraWidth: 0.5 * window.innerHeight
     };
+
+    AppView.DEFAULT_OPTIONS.slideWidth = 0.8 * AppView.DEFAULT_OPTIONS.cameraWidth;
+
+    AppView.DEFAULT_OPTIONS.slideHeight = AppView.DEFAULT_OPTIONS.slideWidth + 40;
+
+    AppView.DEFAULT_OPTIONS.slidePosition = 0.77 * AppView.DEFAULT_OPTIONS.cameraWidth;
+
+
+
+
+
+                              /*********************************/
+/*******************************    PRIVATE HELPER FUNCTIONS      ***************************************/
+                                /*********************************/
+
+
+                                /*********************************/
+                                /**        CREATE CAMERA        **/
+                                /*********************************/
+    
+    function _createCamera(){
+        var camera = new ImageSurface({
+            size: [this.options.cameraWidth, true],
+            content: 'img/camera.png',
+            properties: {
+                width: '100%'
+            }
+        });
+
+        var cameraModifier = new StateModifier({
+            origin: [0.5, 0],
+            align: [0.5, 0],
+            transform: Transform.behind
+        });
+
+        this.add(cameraModifier).add(camera);
+    }
+
+
+
+
+                                /*********************************/
+                                /**        CREATE SLIDESHOW     **/
+                                /*********************************/
+
+    function _createSlideshow() {
+        // passing in data
+        var slideshowView = new SlideshowView({
+            size: [this.options.slideWidth, this.options.slideHeight],
+            data: this.options.data
+        });
+
+        var slideshowModifier = new StateModifier({
+            origin: [0.5, 0],
+            align:  [0.5, 0],
+            transform: Transform.translate(0, this.options.slidePosition, 0)
+        });
+
+        // add a context in order to clip the image
+        var slideshowContainer = new ContainerSurface({
+            properties: {
+                overflow: 'hidden'
+            }
+        });
+
+        this.add(slideshowModifier).add(slideshowContainer);
+
+        slideshowContainer.add(slideshowView);
+
+        slideshowContainer.context.setPerspective(1000);
+    }
+
+
+
+
 
 
 
