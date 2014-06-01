@@ -7,6 +7,7 @@ define(function(require, exports, module){
     var Transform = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Lightbox = require('famous/views/Lightbox');
+    var Easing = require('famous/transitions/Easing');
 
     // make sure you require the SlideView
     var SlideView = require('views/SlideView');
@@ -42,11 +43,25 @@ define(function(require, exports, module){
     SlideshowView.prototype.constructor = SlideshowView;
 
     SlideshowView.prototype.showCurrentSlide = function() {
+        // add a flag to prevent colliding animations when clicking fast
+        this.ready = false;
+
         var slide = this.slides[this.currentIndex];
-        this.lightbox.show(slide);
+
+        this.lightbox.show(slide, function() {
+            // add a flag to prevent colliding animations when clicking fast
+            this.ready = true;
+
+            slide.fadeIn();
+
+        }.bind(this));
     };
 
+
     SlideshowView.prototype.showNextSlide = function() {
+        // add a flag to prevent colliding animations when clicking fast
+        if (!this.ready) return;
+
         this.currentIndex++;
         if(this.currentIndex === this.slides.length)this.currentIndex = 0;
             this.showCurrentSlide();
@@ -61,8 +76,21 @@ define(function(require, exports, module){
     SlideshowView.DEFAULT_OPTIONS = {
         size: [450, 500],
         data: undefined,
-        lightboxOpts: {}
+        lightboxOpts: {
+            inOpacity: 1,
+            outOpacity: 0,
+            inOrigin: [0, 0],
+            outOrigin: [0, 0],
+            showOrigin: [0, 0],
+            // Transform.thenMove() first applies a transform then a
+            // translation based on [x, y, z]
+            inTransform: Transform.thenMove(Transform.rotateX(0.9), [0, -300, -300]),
+            outTransform: Transform.thenMove(Transform.rotateZ(0.7), [0, window.innerHeight, -1000]),
+            inTransition: { duration: 650, curve: 'easeOut' },
+            outTransition: { duration: 500, curve: Easing.inCubic }
+        }
     };
+
 
 
                                 /*********************************/
